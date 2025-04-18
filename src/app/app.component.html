@@ -80,17 +80,17 @@
     <tbody></tbody>
   </table>
 
-  <!-- Modal for View/Update -->
+  <!-- Modal for Create/View/Update -->
   <div class="modal" id="employeeModal">
     <div class="modal-content">
-      <h3 id="modalTitle">View Employee</h3>
+      <h3 id="modalTitle">Employee Details</h3>
       <input type="text" id="empName" placeholder="Name">
       <input type="text" id="empPosition" placeholder="Position">
       <input type="text" id="empDepartment" placeholder="Department">
       <input type="text" id="empSalary" placeholder="Salary">
       <div class="modal-buttons">
         <button onclick="closeModal()">Close</button>
-        <button id="saveBtn" onclick="saveUpdate()">Save</button>
+        <button id="saveBtn" onclick="saveEmployee()">Save</button>
       </div>
     </div>
   </div>
@@ -98,6 +98,7 @@
   <script>
     const API_URL = 'http://localhost:8080/api/employees';
     let currentEmployeeId = null;
+    let isCreating = false;
 
     async function fetchEmployees() {
       const res = await fetch(API_URL);
@@ -122,9 +123,26 @@
       });
     }
 
+    function createEmployee() {
+      isCreating = true;
+      currentEmployeeId = null;
+      document.getElementById('modalTitle').innerText = 'Create Employee';
+      document.getElementById('empName').value = '';
+      document.getElementById('empPosition').value = '';
+      document.getElementById('empDepartment').value = '';
+      document.getElementById('empSalary').value = '';
+      document.getElementById('empName').disabled = false;
+      document.getElementById('empPosition').disabled = false;
+      document.getElementById('empDepartment').disabled = false;
+      document.getElementById('empSalary').disabled = false;
+      document.getElementById('saveBtn').style.display = 'inline-block';
+      document.getElementById('employeeModal').style.display = 'flex';
+    }
+
     async function viewEmployee(id) {
       const res = await fetch(`${API_URL}/${id}`);
       const emp = await res.json();
+      isCreating = false;
       document.getElementById('modalTitle').innerText = 'View Employee';
       document.getElementById('empName').value = emp.name;
       document.getElementById('empPosition').value = emp.position;
@@ -134,13 +152,14 @@
       document.getElementById('empPosition').disabled = true;
       document.getElementById('empDepartment').disabled = true;
       document.getElementById('empSalary').disabled = true;
-      document.getElementById('saveBtn').style.display = 'inline-block';
+      document.getElementById('saveBtn').style.display = 'none';
       document.getElementById('employeeModal').style.display = 'flex';
     }
 
     async function editEmployee(id) {
       const res = await fetch(`${API_URL}/${id}`);
       const emp = await res.json();
+      isCreating = false;
       currentEmployeeId = id;
       document.getElementById('modalTitle').innerText = 'Update Employee';
       document.getElementById('empName').value = emp.name;
@@ -155,17 +174,27 @@
       document.getElementById('employeeModal').style.display = 'flex';
     }
 
-    async function saveUpdate() {
+    async function saveEmployee() {
       const name = document.getElementById('empName').value;
       const position = document.getElementById('empPosition').value;
       const department = document.getElementById('empDepartment').value;
       const salary = document.getElementById('empSalary').value;
 
-      await fetch(`${API_URL}/${currentEmployeeId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, position, department, salary })
-      });
+      const employeeData = { name, position, department, salary };
+
+      if (isCreating) {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(employeeData)
+        });
+      } else {
+        await fetch(`${API_URL}/${currentEmployeeId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(employeeData)
+        });
+      }
 
       closeModal();
       fetchEmployees();
