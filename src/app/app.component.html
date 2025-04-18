@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Employee Management</title>
   <style>
-    /* Global Styles */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #000;
@@ -97,19 +96,27 @@
     .toast {
       visibility: hidden;
       min-width: 200px;
-      background-color: #0f0;
       color: #000;
       text-align: center;
       border-radius: 6px;
-      padding: 10px;
+      padding: 12px 16px;
       position: fixed;
       z-index: 100;
       right: 20px;
       bottom: 20px;
       font-size: 14px;
-      box-shadow: 0 2px 10px rgba(0, 255, 0, 0.2);
+      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
       opacity: 0;
       transition: opacity 0.4s ease, bottom 0.4s ease;
+    }
+
+    .toast.success {
+      background-color: #0f0;
+    }
+
+    .toast.error {
+      background-color: #f00;
+      color: #fff;
     }
 
     .toast.show {
@@ -121,9 +128,11 @@
 </head>
 <body>
 
-  <h2>Employee List
+  <h2>
+    Employee List
     <button onclick="createEmployee()">+ Add</button>
   </h2>
+
   <table id="employeeTable">
     <thead>
       <tr>
@@ -135,10 +144,10 @@
     <tbody></tbody>
   </table>
 
-  <!-- Modal for Create/View/Update -->
+  <!-- Modal -->
   <div class="modal" id="employeeModal">
     <div class="modal-content">
-      <h3 id="modalTitle">Employee Details</h3>
+      <h3 id="modalTitle">Employee</h3>
       <input type="text" id="empName" placeholder="Name">
       <input type="text" id="empPosition" placeholder="Position">
       <input type="text" id="empDepartment" placeholder="Department">
@@ -150,7 +159,7 @@
     </div>
   </div>
 
-  <!-- Toast Message -->
+  <!-- Toast -->
   <div id="toast" class="toast"></div>
 
   <script>
@@ -159,112 +168,110 @@
     let isCreating = false;
 
     async function fetchEmployees() {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      const tbody = document.querySelector('#employeeTable tbody');
-      tbody.innerHTML = '';
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        const tbody = document.querySelector('#employeeTable tbody');
+        tbody.innerHTML = '';
 
-      data.forEach(emp => {
-        const row = document.createElement('tr');
-
-        row.innerHTML = `
-          <td>${emp.name}</td>
-          <td>${emp.position}</td>
-          <td>
-            <button onclick="viewEmployee(${emp.id})">View</button>
-            <button onclick="editEmployee(${emp.id})">Update</button>
-            <button onclick="deleteEmployee(${emp.id})">Delete</button>
-          </td>
-        `;
-
-        tbody.appendChild(row);
-      });
+        data.forEach(emp => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${emp.name}</td>
+            <td>${emp.position}</td>
+            <td>
+              <button onclick="viewEmployee(${emp.id})">View</button>
+              <button onclick="editEmployee(${emp.id})">Update</button>
+              <button onclick="deleteEmployee(${emp.id})">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        showToast('Failed to fetch employees.', 'error');
+      }
     }
 
     function createEmployee() {
       isCreating = true;
       currentEmployeeId = null;
       document.getElementById('modalTitle').innerText = 'Create Employee';
-      document.getElementById('empName').value = '';
-      document.getElementById('empPosition').value = '';
-      document.getElementById('empDepartment').value = '';
-      document.getElementById('empSalary').value = '';
-      document.getElementById('empName').disabled = false;
-      document.getElementById('empPosition').disabled = false;
-      document.getElementById('empDepartment').disabled = false;
-      document.getElementById('empSalary').disabled = false;
+      clearInputs();
+      enableInputs();
       document.getElementById('saveBtn').style.display = 'inline-block';
       document.getElementById('employeeModal').style.display = 'flex';
     }
 
     async function viewEmployee(id) {
-      const res = await fetch(`${API_URL}/${id}`);
-      const emp = await res.json();
-      isCreating = false;
-      document.getElementById('modalTitle').innerText = 'View Employee';
-      document.getElementById('empName').value = emp.name;
-      document.getElementById('empPosition').value = emp.position;
-      document.getElementById('empDepartment').value = emp.department;
-      document.getElementById('empSalary').value = emp.salary;
-      document.getElementById('empName').disabled = true;
-      document.getElementById('empPosition').disabled = true;
-      document.getElementById('empDepartment').disabled = true;
-      document.getElementById('empSalary').disabled = true;
-      document.getElementById('saveBtn').style.display = 'none';
-      document.getElementById('employeeModal').style.display = 'flex';
+      try {
+        const res = await fetch(`${API_URL}/${id}`);
+        const emp = await res.json();
+        isCreating = false;
+        currentEmployeeId = id;
+        document.getElementById('modalTitle').innerText = 'View Employee';
+        setInputs(emp);
+        disableInputs();
+        document.getElementById('saveBtn').style.display = 'none';
+        document.getElementById('employeeModal').style.display = 'flex';
+      } catch {
+        showToast('Failed to load employee.', 'error');
+      }
     }
 
     async function editEmployee(id) {
-      const res = await fetch(`${API_URL}/${id}`);
-      const emp = await res.json();
-      isCreating = false;
-      currentEmployeeId = id;
-      document.getElementById('modalTitle').innerText = 'Update Employee';
-      document.getElementById('empName').value = emp.name;
-      document.getElementById('empPosition').value = emp.position;
-      document.getElementById('empDepartment').value = emp.department;
-      document.getElementById('empSalary').value = emp.salary;
-      document.getElementById('empName').disabled = false;
-      document.getElementById('empPosition').disabled = false;
-      document.getElementById('empDepartment').disabled = false;
-      document.getElementById('empSalary').disabled = false;
-      document.getElementById('saveBtn').style.display = 'inline-block';
-      document.getElementById('employeeModal').style.display = 'flex';
+      try {
+        const res = await fetch(`${API_URL}/${id}`);
+        const emp = await res.json();
+        isCreating = false;
+        currentEmployeeId = id;
+        document.getElementById('modalTitle').innerText = 'Update Employee';
+        setInputs(emp);
+        enableInputs();
+        document.getElementById('saveBtn').style.display = 'inline-block';
+        document.getElementById('employeeModal').style.display = 'flex';
+      } catch {
+        showToast('Failed to load employee.', 'error');
+      }
     }
 
     async function saveEmployee() {
-      const name = document.getElementById('empName').value;
-      const position = document.getElementById('empPosition').value;
-      const department = document.getElementById('empDepartment').value;
-      const salary = document.getElementById('empSalary').value;
+      const employeeData = {
+        name: document.getElementById('empName').value,
+        position: document.getElementById('empPosition').value,
+        department: document.getElementById('empDepartment').value,
+        salary: document.getElementById('empSalary').value
+      };
 
-      const employeeData = { name, position, department, salary };
+      const url = isCreating ? API_URL : `${API_URL}/${currentEmployeeId}`;
+      const method = isCreating ? 'POST' : 'PUT';
 
-      if (isCreating) {
-        await fetch(API_URL, {
-          method: 'POST',
+      try {
+        const res = await fetch(url, {
+          method: method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(employeeData)
         });
-        showToast('✅ Employee created');
-      } else {
-        await fetch(`${API_URL}/${currentEmployeeId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(employeeData)
-        });
-        showToast('✅ Employee updated');
+
+        if (!res.ok) throw new Error('DB error');
+
+        showToast(isCreating ? '✅ Employee created' : '✅ Employee updated', 'success');
+        closeModal();
+        fetchEmployees();
+      } catch (err) {
+        showToast('❌ Failed to save employee.', 'error');
       }
-
-      closeModal();
-      fetchEmployees();
     }
 
     async function deleteEmployee(id) {
       if (confirm('Are you sure you want to delete this employee?')) {
-        await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-        showToast('✅ Employee deleted');
-        fetchEmployees();
+        try {
+          const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error('Delete failed');
+          showToast('✅ Employee deleted', 'success');
+          fetchEmployees();
+        } catch {
+          showToast('❌ Failed to delete employee.', 'error');
+        }
       }
     }
 
@@ -272,12 +279,40 @@
       document.getElementById('employeeModal').style.display = 'none';
     }
 
-    function showToast(message) {
+    function setInputs(emp) {
+      document.getElementById('empName').value = emp.name;
+      document.getElementById('empPosition').value = emp.position;
+      document.getElementById('empDepartment').value = emp.department;
+      document.getElementById('empSalary').value = emp.salary;
+    }
+
+    function clearInputs() {
+      document.getElementById('empName').value = '';
+      document.getElementById('empPosition').value = '';
+      document.getElementById('empDepartment').value = '';
+      document.getElementById('empSalary').value = '';
+    }
+
+    function enableInputs() {
+      document.getElementById('empName').disabled = false;
+      document.getElementById('empPosition').disabled = false;
+      document.getElementById('empDepartment').disabled = false;
+      document.getElementById('empSalary').disabled = false;
+    }
+
+    function disableInputs() {
+      document.getElementById('empName').disabled = true;
+      document.getElementById('empPosition').disabled = true;
+      document.getElementById('empDepartment').disabled = true;
+      document.getElementById('empSalary').disabled = true;
+    }
+
+    function showToast(message, type = 'success') {
       const toast = document.getElementById('toast');
       toast.innerText = message;
-      toast.className = 'toast show';
+      toast.className = `toast ${type} show`;
       setTimeout(() => {
-        toast.className = 'toast';
+        toast.className = `toast ${type}`;
       }, 3000);
     }
 
