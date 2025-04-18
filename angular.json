@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "employee-management-system-frontend": {
+    "employee-management": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/employee-management-system-frontend",
+            "outputPath": "dist/employee-management",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -69,10 +69,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "employee-management-system-frontend:build:production"
+              "buildTarget": "employee-management:build:production"
             },
             "development": {
-              "buildTarget": "employee-management-system-frontend:build:development"
+              "buildTarget": "employee-management:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -105,6 +105,6 @@
     }
   },
   "cli": {
-    "analytics": "21ffc05b-9d96-4d69-b05d-ad4ed7477f00"
+    "analytics": "968f2030-c4c9-44b8-bdfd-1393f77fdca3"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "employee-management-system-frontend",
+  "name": "employee-management",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:employee-management-system-frontend": "node dist/employee-management-system-frontend/server/server.mjs"
+    "serve:ssr:employee-management": "node dist/employee-management/server/server.mjs"
   },
   "private": true,
   "dependencies": {
