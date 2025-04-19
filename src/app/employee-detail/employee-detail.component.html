@@ -1,0 +1,7 @@
+<div *ngIf="employee">
+  <h2>{{employee.name}}</h2>
+  <p><strong>Position:</strong> {{employee.position}}</p>
+  <p><strong>Department:</strong> {{employee.department}}</p>
+  <p><strong>Salary:</strong> {{employee.salary}}</p>
+  <button (click)="delete()">🗑️ Delete</button><button (click)="edit()">✏️ Update</button>
+</div>

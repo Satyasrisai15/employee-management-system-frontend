@@ -1,0 +1,35 @@
+:root {
+  --primary: #007bff;
+  --bg-card: #f8f9fa;
+  --error-red: #dc3545;
+}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eef2f5;
+}
+nav {
+  background: var(--primary);
+  padding: 1rem;
+}
+nav a {
+  color: #fff;
+  margin-right: 1rem;
+  text-decoration: none;
+}
+.container {
+  padding: 1rem;
+  max-width: 800px;
+  margin: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+tr:nth-child(even) {
+  background: #f2f2f2;
+}
+th, td {
+  padding: 0.5rem;
+  text-align: left;
+}

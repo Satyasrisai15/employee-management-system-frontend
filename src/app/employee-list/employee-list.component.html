@@ -1,0 +1,6 @@
+<table>
+  <tr><th>Name</th><th>Position</th></tr>
+  <tr *ngFor="let e of employees" (click)="view(e.id)">
+    <td>{{e.name}}</td><td>{{e.position}}</td>
+  </tr>
+</table>

@@ -1,0 +1,12 @@
+<nav>
+  <a *ngIf="!isLoggedIn" routerLink="/login">Login</a>
+  <a *ngIf="!isLoggedIn" routerLink="/signup">Sign Up</a>
+  <a *ngIf="isLoggedIn" routerLink="/dashboard">Dashboard</a>
+  <a *ngIf="isLoggedIn" routerLink="/employees">Employee List</a>
+  <a *ngIf="isLoggedIn" routerLink="/employees/add">Add Employee</a>
+  <a *ngIf="isLoggedIn" (click)="logout()" style="cursor: pointer;">Logout</a>
+</nav>
+
+<div class="container">
+  <router-outlet></router-outlet>
+</div>

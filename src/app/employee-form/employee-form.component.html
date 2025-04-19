@@ -1,0 +1,7 @@
+<form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+  <label>Name:</label><input formControlName="name" />
+  <label>Position:</label><input formControlName="position" />
+  <label>Department:</label><input formControlName="department" />
+  <label>Salary:</label><input type="number" formControlName="salary" />
+  <button type="submit">{{editId?'Update':'Add'}}</button>
+</form>
